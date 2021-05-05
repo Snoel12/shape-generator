@@ -24,11 +24,19 @@
         flex-wrap: wrap;
       }
 
-      #container > div {
+      #container > .circle {
         background-color: tomato;
         width: 75px;
         height: 75px;
         border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #container > .square {
+        background-color: tomato;
+        width: 75px;
+        height: 75px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -48,66 +56,114 @@
     <title>Shape Generator</title>
   </head>
   <body>
-    <h1><a href='index.html'>Shape Generator</a></h1>
+    <h1 #title>
+      <a href="index.html">Shape Generator</a>
+      <p id="score"></p>
+      <span> Average:</span>
+      <span id="average"></span>
+    </h1>
     <h2>Todos</h2>
     <ul>
-      <li>Create a repo named shape-generator and add this index.html page</li>
-      <li>Currently clicking on the center of a circle causes the center to disappear. This is a bug, the blue circle should disappear.</li>
       <li>
-        Currently the user can enter anything in the input field. Restrict the input to numbers and limit the values to be greater than 25 and less than 250. 
-      </li>
-      <li>
-        Within the h1 element, display the number of circles which are displayed.
-      </li>
-      <li>
-        Within the h1 element, display the average size of the current circles. 
-      </li>
-      <li>
-        Instead of always generating circles, generate either a circle or a square.
+        Within the h1 element, display the average size of the current circles.
       </li>
     </ul>
-    <a href='https://github.com/FullstackAcademy/shape-generator'>Repo</a>
+    <a href="https://github.com/FullstackAcademy/shape-generator">Repo</a>
     <form>
-      <input name='px' value='25'/>
+      <input name="px" type="number" value="25" min="25" max="250" />
     </form>
-    <div id='container'>
-    </div>
+    <div id="container"></div>
     <script>
-      const form = document.querySelector('form');
-      const input = form.querySelector('input');
-      const link = document.querySelector('a');
-      const container = document.querySelector('#container');
+      const form = document.querySelector("form");
+      const input = form.querySelector("input");
+      const link = document.querySelector("a");
+      const container = document.querySelector("#container");
+      let number = 3;
+      let counter = 1;
+      let sizeCounter = 0;
+      let arr = [];
+      let averages = (array) => array.reduce((a, b) => a + b) / array.length;
 
-      container.addEventListener('click', (ev)=>{
-        if(!ev.target.id){
+      document.querySelector("#score").innerHTML = `#: ${number}`;
+
+      container.addEventListener("click", (ev) => {
+        if (ev.target.tagName === "DIV") {
+          console.log(ev.target.tagName);
           ev.target.parentNode.removeChild(ev.target);
+          document.querySelector("#score").innerHTML = number -= 1;
+          sizeCounter -= ev.target.childNodes[0].innerText * 1;
         }
+        if (ev.target.tagName === "SPAN") {
+          console.log(ev.target.tagName);
+          ev.target.parentNode.parentNode.removeChild(ev.target.parentNode);
+          document.querySelector("#score").innerHTML = number -= 1;
+          sizeCounter -= ev.target.innerText * 1;
+        }
+        titleCounter();
       });
 
-      const generateCircle = ()=> {
+      const generateCircle = () => {
+        sizeCounter += input.value * 1;
         const size = `${input.value}px`;
-        const circle = document.createElement('div');
+        const circle = document.createElement("div");
         circle.style.width = size;
         circle.style.height = size;
+        circle.className = "circle";
         container.appendChild(circle);
-        const span = document.createElement('span');
+        const span = document.createElement("span");
         span.innerText = input.value;
         circle.appendChild(span);
-        input.value = 25 + Math.floor(Math.random()*50);
-        window.setTimeout(function(){
-          circle.classList.add('blue');
+
+        arr.push(input.value);
+        input.value = 25 + Math.floor(Math.random() * 50);
+        window.setTimeout(function () {
+          circle.classList.add("blue");
         }, 500);
       };
 
-      form.addEventListener('submit', (ev)=> {
+      const generateSquare = () => {
+        sizeCounter += input.value * 1;
+        const size = `${input.value}px`;
+        const square = document.createElement("div");
+        square.style.width = size;
+        square.style.height = size;
+        square.className = "square";
+        container.appendChild(square);
+        const span = document.createElement("span");
+        span.innerText = input.value;
+        square.appendChild(span);
+
+        input.value = 25 + Math.floor(Math.random() * 50);
+        window.setTimeout(function () {
+          square.classList.add("blue");
+        }, 500);
+      };
+
+      const titleCounter = () => {
+        const numCircles = container.children.length;
+        let averageSizes = Math.round(sizeCounter / container.children.length);
+        if (numCircles === 0) {
+          averageSizes = 0;
+        }
+        document.querySelector("#average").innerHTML = `${averageSizes}`;
+      };
+
+      form.addEventListener("submit", (ev) => {
         ev.preventDefault();
-        generateCircle();
+        if (counter % 2 === 0) {
+          generateCircle();
+        } else {
+          generateSquare();
+        }
+        counter++;
+        document.querySelector("#score").innerHTML = number += 1;
+        titleCounter();
       });
 
       generateCircle();
+      generateSquare();
       generateCircle();
-      generateCircle();
-
+      titleCounter();
     </script>
   </body>
 </html>
